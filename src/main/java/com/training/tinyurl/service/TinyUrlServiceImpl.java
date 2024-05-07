@@ -30,5 +30,4 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
         log.error("User with same email already exists");
         throw new MongoApiException("User with same email already exists");
     }
-
 }

@@ -36,6 +36,13 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
         return new ResponseEntity<>(request.getEmail()+" successfully registered",HttpStatus.CREATED);
     }
 
+    @GetMapping("login")
+    @Override
+    public ResponseEntity<String> loginUser() {
+        log.info("Login successful");
+        return new ResponseEntity<>("Login successful",HttpStatus.OK);
+    }
+
     @GetMapping("hello")
     public String hello() {
         return "Hello";

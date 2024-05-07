@@ -13,11 +13,12 @@ import java.util.Optional;
 @Component
 public class UserInfoEntityUserDetailService implements UserDetailsService {
     @Autowired
-    UserInfoRepo userInfoDb;
+    private UserInfoRepo userInfoDb;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<UserInfoEntity> listOfUsers = userInfoDb.findById(email);
-        return listOfUsers.map(UserInfoEntityUserDetails::new).orElseThrow();
+        Optional<UserInfoEntity> user = userInfoDb.findById(email);
+        return user.map(UserInfoEntityUserDetails::new).
+                orElseThrow(() -> new UsernameNotFoundException("No record found for " + email));
     }
 }
