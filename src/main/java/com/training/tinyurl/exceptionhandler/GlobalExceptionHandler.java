@@ -1,5 +1,6 @@
-package com.training.tinyurl.exceptionalhandler;
+package com.training.tinyurl.exceptionhandler;
 
+import com.mongodb.MongoException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,18 @@ public class GlobalExceptionHandler {
             errMsg.append(err.getDefaultMessage()).append("\n");
             log.warn(err.getDefaultMessage());
         }
-        return new ResponseEntity<>(errMsg.toString(), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errMsg.toString(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MongoException.class)
+    public ResponseEntity<String> handleMongoException(MongoException ex) {
+        log.error(ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MongoApiException.class)
-    public ResponseEntity<String> handleValidationException(MongoApiException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<String> handleMongoApiException(MongoApiException ex) {
+        log.error(ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

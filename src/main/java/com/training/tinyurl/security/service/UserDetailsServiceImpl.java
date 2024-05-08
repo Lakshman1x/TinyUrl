@@ -1,7 +1,8 @@
-package com.training.tinyurl.config;
+package com.training.tinyurl.security.service;
 
 import com.training.tinyurl.entity.UserInfoEntity;
 import com.training.tinyurl.repo.UserInfoRepo;
+import com.training.tinyurl.security.AppUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,13 +12,16 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class UserInfoEntityUserDetailService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserInfoRepo userInfoDb;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<UserInfoEntity> listOfUsers = userInfoDb.findById(email);
-        return listOfUsers.map(UserInfoEntityUserDetails::new).orElseThrow();
+        Optional<UserInfoEntity> user = userInfoDb.findById(email);
+        if(user.isPresent()){
+            return new AppUserDetails(user.get());
+        }
+        throw new UsernameNotFoundException("No record found for "+email);
     }
 }

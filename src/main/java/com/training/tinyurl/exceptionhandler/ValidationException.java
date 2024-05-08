@@ -1,4 +1,4 @@
-package com.training.tinyurl.exceptionalhandler;
+package com.training.tinyurl.exceptionhandler;
 
 import lombok.Getter;
 import org.springframework.validation.BindingResult;

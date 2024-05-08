@@ -1,5 +1,6 @@
-package com.training.tinyurl.config;
+package com.training.tinyurl.security;
 
+import com.training.tinyurl.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -19,20 +20,17 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-        return new UserInfoEntityUserDetailService();
+        return new UserDetailsServiceImpl();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/user/login").permitAll()
                         .requestMatchers("/api/v1/user/register").permitAll()
-                        .requestMatchers("/api/v1/user/**")
-                        .authenticated()
-
-                ).httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
+                        .requestMatchers("/api/v1/user/**").authenticated()
+                )
+                .httpBasic(Customizer.withDefaults())
                 .build();
     }
 

@@ -1,8 +1,8 @@
 package com.training.tinyurl.controller;
 
 import com.training.tinyurl.dto.RegistrationReqDto;
-import com.training.tinyurl.exceptionalhandler.MongoApiException;
-import com.training.tinyurl.exceptionalhandler.ValidationException;
+import com.training.tinyurl.exceptionhandler.MongoApiException;
+import com.training.tinyurl.exceptionhandler.ValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
