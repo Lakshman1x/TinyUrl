@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
             errMsg.append(err.getDefaultMessage()).append("\n");
             log.warn(err.getDefaultMessage());
         }
-        return new ResponseEntity<>(errMsg.toString(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errMsg.toString(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MongoException.class)
@@ -30,6 +30,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MongoApiException.class)
     public ResponseEntity<String> handleMongoApiException(MongoApiException ex) {
         log.error(ex.getMessage());
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ex.getMessage(), ex.getStatusCode());
     }
 }
