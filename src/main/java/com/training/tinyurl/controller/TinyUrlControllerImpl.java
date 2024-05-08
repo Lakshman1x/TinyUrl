@@ -3,12 +3,15 @@ package com.training.tinyurl.controller;
 import com.training.tinyurl.dto.RegistrationReqDto;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
 import com.training.tinyurl.exceptionhandler.ValidationException;
+import com.training.tinyurl.security.AppUserDetails;
 import com.training.tinyurl.service.ITinyUrlService;
 import com.training.tinyurl.util.Validator;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +45,13 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     public ResponseEntity<String> loginUser() {
         log.info("Login successful");
         return new ResponseEntity<>("Login successful",HttpStatus.OK);
+    }
+
+    @GetMapping("upgrade")
+    @PreAuthorize("hasAuthority('BASIC')")
+    public ResponseEntity<String>upgradePlan(){
+        tinyUrlService.upgradePlan();
+        return new ResponseEntity<>("upgrade successful",HttpStatus.OK);
     }
 
 }
