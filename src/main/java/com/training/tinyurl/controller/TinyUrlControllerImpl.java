@@ -1,9 +1,9 @@
 package com.training.tinyurl.controller;
 
 import com.training.tinyurl.dto.RegistrationReqDto;
-import com.training.tinyurl.exceptionalhandler.MongoApiException;
-import com.training.tinyurl.exceptionalhandler.ValidationException;
-import com.training.tinyurl.service.TinyUrlServiceImpl;
+import com.training.tinyurl.exceptionhandler.MongoApiException;
+import com.training.tinyurl.exceptionhandler.ValidationException;
+import com.training.tinyurl.service.ITinyUrlService;
 import com.training.tinyurl.util.Validator;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +20,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequestMapping("/api/v1/user/")
 @Slf4j
 public class TinyUrlControllerImpl implements ITinyUrlController {
-    private final TinyUrlServiceImpl tinyUrlService;
+    private final ITinyUrlService tinyUrlService;
 
-    public TinyUrlControllerImpl(TinyUrlServiceImpl tinyUrlService) {
+    public TinyUrlControllerImpl(ITinyUrlService tinyUrlService) {
         this.tinyUrlService = tinyUrlService;
     }
 
     @PostMapping("register")
     @Override
     public ResponseEntity<String> registerUser(@RequestBody @Valid RegistrationReqDto request,
-                                             BindingResult bindingResult) throws ValidationException, MongoApiException {
+                                               BindingResult bindingResult)
+                                                throws ValidationException, MongoApiException {
         Validator.validate(bindingResult);
         tinyUrlService.createNewUser(request);
         log.info(request.getEmail()+" successfully registered");
@@ -41,11 +42,6 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     public ResponseEntity<String> loginUser() {
         log.info("Login successful");
         return new ResponseEntity<>("Login successful",HttpStatus.OK);
-    }
-
-    @GetMapping("hello")
-    public String hello() {
-        return "Hello";
     }
 
 }

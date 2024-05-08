@@ -1,28 +1,23 @@
-package com.training.tinyurl.config;
+package com.training.tinyurl.security;
 
 import com.training.tinyurl.entity.UserInfoEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-
-public class UserInfoEntityUserDetails implements UserDetails {
+public class AppUserDetails implements UserDetails {
 
     private String email;
     private String password;
     private List<GrantedAuthority> authorityList;
 
-    public UserInfoEntityUserDetails(UserInfoEntity info){
+    public AppUserDetails(UserInfoEntity info){
         this.email=info.getEmail();
         this.password=info.getPassword();
-        this.authorityList= Arrays.stream(info.getAccountType().toString().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        this.authorityList = Collections.singletonList(new SimpleGrantedAuthority(info.getAccountType().toString()));
     }
 
     @Override

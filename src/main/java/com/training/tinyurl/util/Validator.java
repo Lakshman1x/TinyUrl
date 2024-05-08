@@ -1,6 +1,6 @@
 package com.training.tinyurl.util;
 
-import com.training.tinyurl.exceptionalhandler.ValidationException;
+import com.training.tinyurl.exceptionhandler.ValidationException;
 import org.springframework.validation.BindingResult;
 
 public class Validator {

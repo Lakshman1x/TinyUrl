@@ -1,5 +1,6 @@
-package com.training.tinyurl.config;
+package com.training.tinyurl.security;
 
+import com.training.tinyurl.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +23,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-        return new UserInfoEntityUserDetailService();
+        return new UserDetailsServiceImpl();
     }
 
     @Bean
