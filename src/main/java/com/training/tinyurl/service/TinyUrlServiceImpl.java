@@ -48,6 +48,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
                 userDetails.getPassword(),
                 AccountType.PREMIUM
         ));
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
 }
