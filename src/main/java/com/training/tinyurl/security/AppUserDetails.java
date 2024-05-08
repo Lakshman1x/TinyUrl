@@ -32,7 +32,7 @@ public class AppUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return this.email;
     }
 
     @Override
