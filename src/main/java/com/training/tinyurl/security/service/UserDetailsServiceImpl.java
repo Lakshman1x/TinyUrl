@@ -18,8 +18,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<UserInfoEntity> user = userInfoDb.findById(email);
+        String finalEmail = email.toUpperCase();
+        Optional<UserInfoEntity> user = userInfoDb.findById(finalEmail);
         return user.map(AppUserDetails::new).
-                orElseThrow(() -> new UsernameNotFoundException("No record found for " + email));
+                orElseThrow(() -> new UsernameNotFoundException("No record found for "+ finalEmail));
     }
 }
