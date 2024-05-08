@@ -28,7 +28,8 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     @PostMapping("register")
     @Override
     public ResponseEntity<String> registerUser(@RequestBody @Valid RegistrationReqDto request,
-                                             BindingResult bindingResult) throws ValidationException, MongoApiException {
+                                               BindingResult bindingResult)
+            throws ValidationException, MongoApiException {
         Validator.validate(bindingResult);
         tinyUrlService.createNewUser(request);
         log.info(request.getEmail()+" successfully registered");
