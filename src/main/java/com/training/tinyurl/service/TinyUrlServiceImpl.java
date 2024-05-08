@@ -5,6 +5,7 @@ import com.training.tinyurl.entity.UserInfoEntity;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
 import com.training.tinyurl.repo.UserInfoRepo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
 
     @Override
     public void createNewUser(RegistrationReqDto request) throws MongoApiException {
+        request.setEmail(request.getEmail().toUpperCase());
         if(!userInfoRepo.existsById(request.getEmail())){
             userInfoRepo.save(new UserInfoEntity(
                     request.getEmail(),
@@ -30,7 +32,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
             return;
         }
         log.error("User with same email already exists");
-        throw new MongoApiException("User with same email already exists");
+        throw new MongoApiException(HttpStatus.BAD_REQUEST,"User with same email already exists");
     }
 
 }
