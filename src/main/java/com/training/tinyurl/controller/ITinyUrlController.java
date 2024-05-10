@@ -7,7 +7,10 @@ import com.training.tinyurl.exceptionhandler.ValidationException;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.security.NoSuchAlgorithmException;
 
 public interface ITinyUrlController {
@@ -17,4 +20,5 @@ public interface ITinyUrlController {
     public ResponseEntity<String>upgradePlan();
     public ResponseEntity<String> getTinyUrl(TinyUrlDto dto, BindingResult result)
             throws ValidationException, NoSuchAlgorithmException;
+    public ResponseEntity<String> getFullUrl(String tinyurl);
 }

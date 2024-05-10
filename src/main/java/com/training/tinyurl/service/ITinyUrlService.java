@@ -1,8 +1,10 @@
 package com.training.tinyurl.service;
 
 import com.training.tinyurl.dto.RegistrationReqDto;
+import com.training.tinyurl.entity.TinyUrlEntity;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 public interface ITinyUrlService {
     public void createNewUser(RegistrationReqDto request) throws MongoApiException;
@@ -10,4 +12,6 @@ public interface ITinyUrlService {
     public void upgradePlan();
 
     public String getTinyUrl(String longUrl) throws NoSuchAlgorithmException;
+
+    public Optional<TinyUrlEntity> getUrlEntity(String tinyurl);
 }

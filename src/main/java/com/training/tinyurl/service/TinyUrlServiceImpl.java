@@ -90,4 +90,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
         return shortCode;
     }
 
+    public Optional<TinyUrlEntity> getUrlEntity(String tinyurl){
+        return tinyUrlRepo.findById(tinyurl);
+    }
 }
