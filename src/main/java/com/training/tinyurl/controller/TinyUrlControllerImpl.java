@@ -1,6 +1,7 @@
 package com.training.tinyurl.controller;
 
 import com.training.tinyurl.dto.RegistrationReqDto;
+import com.training.tinyurl.dto.TinyUrlDto;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
 import com.training.tinyurl.exceptionhandler.ValidationException;
 import com.training.tinyurl.service.ITinyUrlService;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/api/v1/user/")
@@ -53,4 +56,11 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
         return new ResponseEntity<>("upgrade successful please login again",HttpStatus.OK);
     }
 
+    @PostMapping("gettinyurl")
+    @Override
+    public String getTinyUrl(@RequestBody @Valid TinyUrlDto dto, BindingResult result)
+                                throws ValidationException, NoSuchAlgorithmException {
+        Validator.validate(result);
+        return tinyUrlService.getTinyUrl(dto.getLongUrl());
+    }
 }
