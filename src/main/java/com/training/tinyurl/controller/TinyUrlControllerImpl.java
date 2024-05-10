@@ -58,9 +58,9 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
 
     @PostMapping("gettinyurl")
     @Override
-    public String getTinyUrl(@RequestBody @Valid TinyUrlDto dto, BindingResult result)
+    public ResponseEntity<String> getTinyUrl(@RequestBody @Valid TinyUrlDto dto, BindingResult result)
                                 throws ValidationException, NoSuchAlgorithmException {
         Validator.validate(result);
-        return tinyUrlService.getTinyUrl(dto.getLongUrl());
+        return new ResponseEntity<>(tinyUrlService.getTinyUrl(dto.getLongUrl()),HttpStatus.OK);
     }
 }
