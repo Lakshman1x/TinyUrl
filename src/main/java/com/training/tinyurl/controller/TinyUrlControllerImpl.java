@@ -2,26 +2,27 @@ package com.training.tinyurl.controller;
 
 import com.training.tinyurl.dto.RegistrationReqDto;
 import com.training.tinyurl.dto.TinyUrlDto;
-import com.training.tinyurl.entity.TinyUrlEntity;
+import com.training.tinyurl.dto.UpdateUrlDto;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
 import com.training.tinyurl.exceptionhandler.ValidationException;
 import com.training.tinyurl.service.ITinyUrlService;
 import com.training.tinyurl.util.Validator;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/user/")
@@ -69,12 +70,35 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
 
     @GetMapping("fetch")
     @Override
-    public ResponseEntity<String> getFullUrl(@RequestParam String tinyurl){
-        Optional<TinyUrlEntity> res = tinyUrlService.getUrlEntity(tinyurl);
-        if(res.isPresent()){
-            return new ResponseEntity<>(res.get().getLongUrl(), HttpStatus.OK);
-        }
-        log.error("No tinyurl found in the database");
-        return new ResponseEntity<>("Tinyurl not found in db", HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> getFullUrl(@RequestParam String tinyurl) throws MongoApiException {
+        String fullUrl = tinyUrlService.getLongLink(tinyurl);
+        return new ResponseEntity<>(fullUrl, HttpStatus.OK);
     }
+
+    @GetMapping("redirect")
+    @Override
+    public ResponseEntity<Void> redirectToNewUrl(@RequestParam String tinyurl) throws MongoApiException {
+        String fullUrl = tinyUrlService.getLongLink(tinyurl);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.LOCATION, fullUrl);
+        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+    }
+
+    @DeleteMapping("delete")
+    @Override
+    public ResponseEntity<Void> deleteTinyUrl(@RequestParam String tinyurl) throws MongoApiException {
+       tinyUrlService.deleteTinyUrl(tinyurl);
+       return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("update")
+    @PreAuthorize("hasAuthority('PREMIUM')")
+    @Override
+    public ResponseEntity<Void> reMapTinyUrl(@RequestBody @Valid UpdateUrlDto dto, BindingResult result)
+            throws ValidationException, MongoApiException {
+        Validator.validate(result);
+        tinyUrlService.reMapTinyUrl(dto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

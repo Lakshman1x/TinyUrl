@@ -2,6 +2,7 @@ package com.training.tinyurl.service;
 
 import com.training.tinyurl.constants.AccountType;
 import com.training.tinyurl.dto.RegistrationReqDto;
+import com.training.tinyurl.dto.UpdateUrlDto;
 import com.training.tinyurl.entity.TinyUrlEntity;
 import com.training.tinyurl.entity.UserInfoEntity;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
@@ -76,10 +77,11 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
         }
     }
 
+    @Override
     public String getTinyUrl(String longUrl) throws NoSuchAlgorithmException {
         if(!isAllowedToGenUrl()){
-            return "Please upgrade your plan as you have reached your quota";}
-
+            return "Please upgrade your plan as you have reached your quota";
+        }
         Optional<TinyUrlEntity> result= tinyUrlRepo.findByLongUrl(longUrl);
         if(result.isPresent()){
             return result.get().getTinyUrl();
@@ -90,7 +92,29 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
         return shortCode;
     }
 
-    public Optional<TinyUrlEntity> getUrlEntity(String tinyurl){
-        return tinyUrlRepo.findById(tinyurl);
+    private TinyUrlEntity getTinyUrlEntity(String tinyUrl) throws MongoApiException {
+        Optional<TinyUrlEntity> res= tinyUrlRepo.findById(tinyUrl);
+        if(res.isPresent()){return res.get();}
+        log.error("No record found for "+tinyUrl);
+        throw new MongoApiException(HttpStatus.NOT_FOUND,"No record found for "+tinyUrl);
     }
+
+    @Override
+    public String getLongLink(String tinyUrl) throws MongoApiException {
+        return getTinyUrlEntity(tinyUrl).getLongUrl();
+    }
+
+    @Override
+    public void deleteTinyUrl(String tinyUrl) throws MongoApiException {
+        TinyUrlEntity res = getTinyUrlEntity(tinyUrl);
+        tinyUrlRepo.delete(res);
+    }
+
+    @Override
+    public void reMapTinyUrl(UpdateUrlDto dto) throws MongoApiException {
+        TinyUrlEntity res = getTinyUrlEntity(dto.getTinyUrl());
+        res.setLongUrl(dto.getLongUrl());
+        tinyUrlRepo.save(res);
+    }
+
 }

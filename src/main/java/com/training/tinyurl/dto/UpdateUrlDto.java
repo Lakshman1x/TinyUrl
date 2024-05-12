@@ -9,7 +9,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TinyUrlDto {
+public class UpdateUrlDto {
+
+    @NotBlank(message = "tinyUrl can not be blank")
+    private String tinyUrl;
+
     @NotBlank(message = "long url can not be blank")
     @Pattern(regexp = "^(https?|ftp):\\/\\/[^\\s\\/$.?#].[^\\s]*$", message = "Not a valid URL")
     private String longUrl;
