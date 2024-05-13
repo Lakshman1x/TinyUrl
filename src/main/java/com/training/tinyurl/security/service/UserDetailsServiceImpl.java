@@ -21,8 +21,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         final String emailInCaps = email.toUpperCase();
         Optional<UserInfoEntity> user = userInfoDb.findById(emailInCaps);
-        if(user.isEmpty()){log.error("User login was unauthorized. No record found for "+emailInCaps);}
-        return user.map(AppUserDetails::new).
-                orElseThrow(() -> new UsernameNotFoundException("No record found for "+ emailInCaps));
+        if(user.isEmpty()){
+            log.error("User login was unauthorized. No record found for "+emailInCaps);
+            throw new UsernameNotFoundException("No record found for "+ emailInCaps);
+        }
+        return user.map(AppUserDetails::new).get();
     }
 }

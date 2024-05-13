@@ -4,10 +4,8 @@ import com.training.tinyurl.dto.RegistrationReqDto;
 import com.training.tinyurl.entity.UserInfoEntity;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
 import com.training.tinyurl.repo.UserInfoRepo;
-import com.training.tinyurl.security.AppUserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,14 +37,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
     }
 
     @Override
-    public AppUserDetails getLoggedInUserDetails(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (AppUserDetails) authentication.getPrincipal();
-    }
-
-    @Override
     public void logoutUser() {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
-
 }
