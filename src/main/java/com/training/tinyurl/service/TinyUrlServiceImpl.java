@@ -51,4 +51,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
+    public void logoutUser() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
 }
