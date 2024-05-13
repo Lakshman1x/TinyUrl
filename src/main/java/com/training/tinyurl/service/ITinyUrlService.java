@@ -5,4 +5,5 @@ import com.training.tinyurl.exceptionhandler.MongoApiException;
 
 public interface ITinyUrlService {
     public void createNewUser(RegistrationReqDto request) throws MongoApiException;
+    public void logoutUser();
 }

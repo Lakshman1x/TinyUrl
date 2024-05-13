@@ -6,6 +6,7 @@ import com.training.tinyurl.exceptionhandler.MongoApiException;
 import com.training.tinyurl.repo.UserInfoRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +30,14 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
                     request.getEmail(),
                     encoder.encode(request.getPassword()),
                     request.getAccountType()));
-            return;
+                    return;
         }
         log.error("User with same email already exists");
         throw new MongoApiException(HttpStatus.CONFLICT,"User with same email already exists");
     }
 
+    @Override
+    public void logoutUser() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
 }
