@@ -42,7 +42,7 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     public ResponseEntity<String> loginUser() {
         String username = tinyUrlService.getLoggedInUserDetails().getUsername();
         log.info(username+" login successful");
-        return new ResponseEntity<>(username+" login successful",HttpStatus.OK);
+        return new ResponseEntity<>("Login successful",HttpStatus.OK);
     }
 
     @GetMapping("logout")
@@ -51,6 +51,6 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
         String username = tinyUrlService.getLoggedInUserDetails().getUsername();
         tinyUrlService.logoutUser();
         log.info(username+" logged out");
-        return new ResponseEntity<>(username+" logged out",HttpStatus.OK);
+        return new ResponseEntity<>("Logged out",HttpStatus.OK);
     }
 }
