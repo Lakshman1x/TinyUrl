@@ -10,4 +10,5 @@ public interface ITinyUrlController {
     public ResponseEntity<String> registerUser(RegistrationReqDto request, BindingResult result)
             throws ValidationException, MongoApiException;
     public ResponseEntity<String> loginUser();
+    public ResponseEntity<String> logoutUser();
 }

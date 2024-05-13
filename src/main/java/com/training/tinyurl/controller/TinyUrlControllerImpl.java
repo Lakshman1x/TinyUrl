@@ -40,8 +40,17 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     @GetMapping("login")
     @Override
     public ResponseEntity<String> loginUser() {
-        log.info("Login successful");
-        return new ResponseEntity<>("Login successful",HttpStatus.OK);
+        String username = tinyUrlService.getLoggedInUserDetails().getUsername();
+        log.info(username+" login successful");
+        return new ResponseEntity<>(username+" login successful",HttpStatus.OK);
     }
 
+    @GetMapping("logout")
+    @Override
+    public ResponseEntity<String> logoutUser() {
+        String username = tinyUrlService.getLoggedInUserDetails().getUsername();
+        tinyUrlService.logoutUser();
+        log.info(username+" logged out");
+        return new ResponseEntity<>(username+" logged out",HttpStatus.OK);
+    }
 }
