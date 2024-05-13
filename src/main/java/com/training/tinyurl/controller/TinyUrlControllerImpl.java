@@ -61,7 +61,7 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     @PutMapping("upgradePlan")
     @PreAuthorize("hasAuthority('BASIC')")
     @Override
-    public ResponseEntity<String>upgradePlan(){
+    public ResponseEntity<String> upgradePlan(){
         tinyUrlService.upgradePlan();
         return new ResponseEntity<>("upgrade successful please login again",HttpStatus.OK);
     }

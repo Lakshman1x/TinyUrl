@@ -48,9 +48,11 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
                 userDetails.getPassword(),
                 AccountType.PREMIUM
         ));
-        SecurityContextHolder.getContext().setAuthentication(null);
+        // we need to login again once the authorities are changed
+        logoutUser();
     }
 
+    @Override
     public void logoutUser() {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
