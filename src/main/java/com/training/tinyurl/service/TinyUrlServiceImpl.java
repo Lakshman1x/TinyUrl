@@ -40,7 +40,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
     }
 
     @Override
-    public  void upgradePlan(){
+    public void upgradePlan(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
         userInfoRepo.save(new UserInfoEntity(

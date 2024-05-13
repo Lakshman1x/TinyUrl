@@ -45,7 +45,7 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
         return new ResponseEntity<>("Login successful",HttpStatus.OK);
     }
 
-    @GetMapping("upgrade")
+    @PostMapping("upgradePlan")
     @PreAuthorize("hasAuthority('BASIC')")
     @Override
     public ResponseEntity<String>upgradePlan(){
