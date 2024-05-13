@@ -54,4 +54,6 @@ public class AppUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public String getEmail(){return this.email;}
 }

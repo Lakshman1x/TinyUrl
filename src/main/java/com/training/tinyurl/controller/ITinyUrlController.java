@@ -12,4 +12,5 @@ public interface ITinyUrlController {
             throws ValidationException, MongoApiException;
     public ResponseEntity<String> loginUser(AppUserDetails user);
     public ResponseEntity<String> logoutUser(AppUserDetails user);
+    public ResponseEntity<String> upgradePlan();
 }
