@@ -73,7 +73,7 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
         return new ResponseEntity<>("upgrade successful please login again",HttpStatus.OK);
     }
 
-    @PostMapping("gettinyurl")
+    @PostMapping("getTinyUrl")
     @Override
     public ResponseEntity<String> getTinyUrl(@RequestBody @Valid TinyUrlDto dto, BindingResult result,
                                              @AuthenticationPrincipal AppUserDetails user)
