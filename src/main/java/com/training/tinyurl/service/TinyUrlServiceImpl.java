@@ -12,7 +12,6 @@ import com.training.tinyurl.security.AppUserDetails;
 import com.training.tinyurl.util.TinyUrlGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,9 +47,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
     }
 
     @Override
-    public void upgradePlan(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
+    public void upgradePlan(AppUserDetails userDetails){
         userInfoRepo.save(new UserInfoEntity(
                 userDetails.getEmail(),
                 userDetails.getPassword(),
@@ -65,16 +62,13 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
-    private boolean isAllowedToGenUrl(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
-        Optional<UserInfoEntity> userInfo = userInfoRepo.findById(userDetails.getEmail());
+    private boolean isAllowedToGenUrl(AppUserDetails user){
+        Optional<UserInfoEntity> userInfo = userInfoRepo.findById(user.getEmail());
         return userInfo.get().getAccountType().toString().equals("PREMIUM")
                 || userInfo.get().getUsedQuota() < 100;
     }
-    private void incrementUserQuota(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
+
+    private void incrementUserQuota(AppUserDetails userDetails){
         Optional<UserInfoEntity> userInfo = userInfoRepo.findById(userDetails.getEmail());
         if(userInfo.isPresent()) {
             int usedQuota = userInfo.get().getUsedQuota();
@@ -84,8 +78,8 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
     }
 
     @Override
-    public String getTinyUrl(String longUrl) throws NoSuchAlgorithmException {
-        if(!isAllowedToGenUrl()){
+    public String genTinyUrl(String longUrl, AppUserDetails user) throws NoSuchAlgorithmException {
+        if(!isAllowedToGenUrl(user)){
             return "Please upgrade your plan as you have reached your quota";
         }
         Optional<TinyUrlEntity> result= tinyUrlRepo.findByLongUrl(longUrl);
@@ -94,7 +88,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
         }
         String shortCode =TinyUrlGenerator.createShortCode(longUrl);
         tinyUrlRepo.save(new TinyUrlEntity(shortCode,longUrl));
-        incrementUserQuota();
+        incrementUserQuota(user);
         return shortCode;
     }
 

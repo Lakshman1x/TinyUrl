@@ -15,8 +15,8 @@ public interface ITinyUrlController {
             throws ValidationException, MongoApiException;
     public ResponseEntity<String> loginUser(AppUserDetails user);
     public ResponseEntity<String> logoutUser(AppUserDetails user);
-    public ResponseEntity<String> upgradePlan();
-    public ResponseEntity<String> getTinyUrl(TinyUrlDto dto, BindingResult result)
+    public ResponseEntity<String> upgradePlan(AppUserDetails user);
+    public ResponseEntity<String> getTinyUrl(TinyUrlDto dto, BindingResult result,AppUserDetails user)
             throws ValidationException, NoSuchAlgorithmException;
     public ResponseEntity<String> getFullUrl(String tinyurl) throws MongoApiException;
     public ResponseEntity<Void> redirectToNewUrl(String tinyUrl) throws MongoApiException;

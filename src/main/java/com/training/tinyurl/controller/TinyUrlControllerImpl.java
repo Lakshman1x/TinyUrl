@@ -18,7 +18,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,23 +67,28 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     @PutMapping("upgradePlan")
     @PreAuthorize("hasAuthority('BASIC')")
     @Override
-    public ResponseEntity<String> upgradePlan(){
-        tinyUrlService.upgradePlan();
+    public ResponseEntity<String> upgradePlan(@AuthenticationPrincipal AppUserDetails user){
+        tinyUrlService.upgradePlan(user);
+        log.info("Plan upgrade for "+user.getEmail());
         return new ResponseEntity<>("upgrade successful please login again",HttpStatus.OK);
     }
 
     @PostMapping("gettinyurl")
     @Override
-    public ResponseEntity<String> getTinyUrl(@RequestBody @Valid TinyUrlDto dto, BindingResult result)
+    public ResponseEntity<String> getTinyUrl(@RequestBody @Valid TinyUrlDto dto, BindingResult result,
+                                             @AuthenticationPrincipal AppUserDetails user)
                                 throws ValidationException, NoSuchAlgorithmException {
         Validator.validate(result);
-        return new ResponseEntity<>(tinyUrlService.getTinyUrl(dto.getLongUrl()),HttpStatus.OK);
+        String tinyurl=tinyUrlService.genTinyUrl(dto.getLongUrl(),user);
+        log.info("Generated tinyurl : " +tinyurl);
+        return new ResponseEntity<>(tinyurl,HttpStatus.OK);
     }
 
     @GetMapping("fetch")
     @Override
     public ResponseEntity<String> getFullUrl(@RequestParam String tinyurl) throws MongoApiException {
         String fullUrl = tinyUrlService.getLongLink(tinyurl);
+        log.info("Fetching full url for "+tinyurl);
         return new ResponseEntity<>(fullUrl, HttpStatus.OK);
     }
 
@@ -101,6 +105,7 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     @Override
     public ResponseEntity<Void> deleteTinyUrl(@RequestParam String tinyurl) throws MongoApiException {
        tinyUrlService.deleteTinyUrl(tinyurl);
+       log.info("Deleted "+tinyurl);
        return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -111,6 +116,7 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
             throws ValidationException, MongoApiException {
         Validator.validate(result);
         tinyUrlService.reMapTinyUrl(dto);
+        log.info("Remapping "+dto.getTinyUrl());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
