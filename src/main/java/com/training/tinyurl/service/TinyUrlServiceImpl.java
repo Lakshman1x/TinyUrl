@@ -48,7 +48,7 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
     }
 
     @Override
-    public  void upgradePlan(){
+    public void upgradePlan(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
         userInfoRepo.save(new UserInfoEntity(
@@ -56,6 +56,12 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
                 userDetails.getPassword(),
                 AccountType.PREMIUM
         ));
+        // we need to login again once the authorities are changed
+        logoutUser();
+    }
+
+    @Override
+    public void logoutUser() {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
@@ -116,5 +122,4 @@ public class TinyUrlServiceImpl implements ITinyUrlService{
         res.setLongUrl(dto.getLongUrl());
         tinyUrlRepo.save(res);
     }
-
 }

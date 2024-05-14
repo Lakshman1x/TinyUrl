@@ -5,6 +5,7 @@ import com.training.tinyurl.dto.TinyUrlDto;
 import com.training.tinyurl.dto.UpdateUrlDto;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
 import com.training.tinyurl.exceptionhandler.ValidationException;
+import com.training.tinyurl.security.AppUserDetails;
 import com.training.tinyurl.service.ITinyUrlService;
 import com.training.tinyurl.util.Validator;
 import jakarta.validation.Valid;
@@ -13,7 +14,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,15 +50,25 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
 
     @GetMapping("login")
     @Override
-    public ResponseEntity<String> loginUser() {
-        log.info("Login successful");
+    public ResponseEntity<String> loginUser(@AuthenticationPrincipal AppUserDetails user) {
+        String username = user.getUsername();
+        log.info(username+" login successful");
         return new ResponseEntity<>("Login successful",HttpStatus.OK);
     }
 
-    @GetMapping("upgrade")
+    @GetMapping("logout")
+    @Override
+    public ResponseEntity<String> logoutUser(@AuthenticationPrincipal AppUserDetails user) {
+        String username= user.getUsername();
+        tinyUrlService.logoutUser();
+        log.info(username+" logged out");
+        return new ResponseEntity<>("Logged out",HttpStatus.OK);
+    }
+
+    @PutMapping("upgradePlan")
     @PreAuthorize("hasAuthority('BASIC')")
     @Override
-    public ResponseEntity<String>upgradePlan(){
+    public ResponseEntity<String> upgradePlan(){
         tinyUrlService.upgradePlan();
         return new ResponseEntity<>("upgrade successful please login again",HttpStatus.OK);
     }
@@ -100,5 +113,4 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
         tinyUrlService.reMapTinyUrl(dto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }
