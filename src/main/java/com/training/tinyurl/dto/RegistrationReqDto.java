@@ -1,6 +1,7 @@
 package com.training.tinyurl.dto;
 
 import com.training.tinyurl.constants.AccountType;
+import com.training.tinyurl.constants.RegexpPattern;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,7 +23,7 @@ public class RegistrationReqDto {
 
     @NotBlank(message = "Password can not be blank")
     @Size(min = 8, max = 64, message = "Password size must be between 8 and 64")
-    @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).+$",
+    @Pattern(regexp = RegexpPattern.PASSWORD_PATTERN,
             message = "Password must contain a number, a lowercase, and a uppercase")
     private String password;
 
