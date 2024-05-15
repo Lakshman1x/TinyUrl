@@ -32,4 +32,22 @@ public class GlobalExceptionHandler {
         log.error(ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), ex.getStatusCode());
     }
+    @ExceptionHandler(TooManyCollisionsException.class)
+    public ResponseEntity<String> handleTooManyCollisions(TooManyCollisionsException ex) {
+        log.error(ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(QuotaLimitExceededException.class)
+    public ResponseEntity<String> handleQuotaLimitExceeded(QuotaLimitExceededException ex){
+     log.error(ex.getMessage());
+     return new ResponseEntity<>(ex.getMessage(),HttpStatus.PAYMENT_REQUIRED);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex){
+        log.error(ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

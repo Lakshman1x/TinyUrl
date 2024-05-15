@@ -1,14 +1,17 @@
 package com.training.tinyurl.controller;
 
-import com.training.tinyurl.dto.RegistrationReqDto;
+import com.training.tinyurl.constants.RegexpPattern;
 import com.training.tinyurl.dto.TinyUrlDto;
 import com.training.tinyurl.dto.UpdateUrlDto;
 import com.training.tinyurl.exceptionhandler.MongoApiException;
+import com.training.tinyurl.exceptionhandler.QuotaLimitExceededException;
+import com.training.tinyurl.exceptionhandler.TooManyCollisionsException;
 import com.training.tinyurl.exceptionhandler.ValidationException;
 import com.training.tinyurl.security.AppUserDetails;
 import com.training.tinyurl.service.ITinyUrlService;
 import com.training.tinyurl.util.Validator;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,7 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.security.NoSuchAlgorithmException;
 
 @RestController
-@RequestMapping("/api/v1/user/")
+@RequestMapping("/api/v1/user/url")
 @Slf4j
 public class TinyUrlControllerImpl implements ITinyUrlController {
     private final ITinyUrlService tinyUrlService;
@@ -36,66 +39,32 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
         this.tinyUrlService = tinyUrlService;
     }
 
-    @PostMapping("register")
-    @Override
-    public ResponseEntity<String> registerUser(@RequestBody @Valid RegistrationReqDto request,
-                                               BindingResult bindingResult)
-                                                throws ValidationException, MongoApiException {
-        Validator.validate(bindingResult);
-        tinyUrlService.createNewUser(request);
-        log.info(request.getEmail()+" successfully registered");
-        return new ResponseEntity<>(request.getEmail()+" successfully registered",HttpStatus.CREATED);
-    }
-
-    @GetMapping("login")
-    @Override
-    public ResponseEntity<String> loginUser(@AuthenticationPrincipal AppUserDetails user) {
-        String username = user.getUsername();
-        log.info(username+" login successful");
-        return new ResponseEntity<>("Login successful",HttpStatus.OK);
-    }
-
-    @GetMapping("logout")
-    @Override
-    public ResponseEntity<String> logoutUser(@AuthenticationPrincipal AppUserDetails user) {
-        String username= user.getUsername();
-        tinyUrlService.logoutUser();
-        log.info(username+" logged out");
-        return new ResponseEntity<>("Logged out",HttpStatus.OK);
-    }
-
-    @PutMapping("upgradePlan")
-    @PreAuthorize("hasAuthority('BASIC')")
-    @Override
-    public ResponseEntity<String> upgradePlan(@AuthenticationPrincipal AppUserDetails user){
-        tinyUrlService.upgradePlan(user);
-        log.info("Plan upgrade for "+user.getEmail());
-        return new ResponseEntity<>("upgrade successful please login again",HttpStatus.OK);
-    }
-
     @PostMapping("getTinyUrl")
     @Override
     public ResponseEntity<String> getTinyUrl(@RequestBody @Valid TinyUrlDto dto, BindingResult result,
                                              @AuthenticationPrincipal AppUserDetails user)
-                                throws ValidationException, NoSuchAlgorithmException {
+            throws ValidationException, NoSuchAlgorithmException, TooManyCollisionsException,
+            QuotaLimitExceededException {
         Validator.validate(result);
-        String tinyurl=tinyUrlService.genTinyUrl(dto.getLongUrl(),user);
-        log.info("Generated tinyurl : " +tinyurl);
-        return new ResponseEntity<>(tinyurl,HttpStatus.OK);
+        String tinyurl = tinyUrlService.generateTinyUrl(dto.getLongUrl(), user);
+        log.info("Generated tinyurl : " + tinyurl);
+        return new ResponseEntity<>(tinyurl, HttpStatus.OK);
     }
 
     @GetMapping("fetch")
     @Override
-    public ResponseEntity<String> getFullUrl(@RequestParam String tinyurl) throws MongoApiException {
-        String fullUrl = tinyUrlService.getLongLink(tinyurl);
-        log.info("Fetching full url for "+tinyurl);
+    public ResponseEntity<String> getFullUrl(@RequestParam @Pattern(regexp = RegexpPattern.BASE64_PATTERN)
+                                                 String tinyurl) throws MongoApiException {
+        String fullUrl = tinyUrlService.getLongUrl(tinyurl);
+        log.info("Fetching full url for " + tinyurl);
         return new ResponseEntity<>(fullUrl, HttpStatus.OK);
     }
 
     @GetMapping("redirect")
     @Override
-    public ResponseEntity<Void> redirectToNewUrl(@RequestParam String tinyurl) throws MongoApiException {
-        String fullUrl = tinyUrlService.getLongLink(tinyurl);
+    public ResponseEntity<Void> redirectToFullUrl(@RequestParam @Pattern(regexp = RegexpPattern.BASE64_PATTERN)
+                                                      String tinyurl) throws MongoApiException {
+        String fullUrl = tinyUrlService.getLongUrl(tinyurl);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.LOCATION, fullUrl);
         return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
@@ -103,10 +72,11 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
 
     @DeleteMapping("delete")
     @Override
-    public ResponseEntity<Void> deleteTinyUrl(@RequestParam String tinyurl) throws MongoApiException {
-       tinyUrlService.deleteTinyUrl(tinyurl);
-       log.info("Deleted "+tinyurl);
-       return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> deleteTinyUrl(@RequestParam @Pattern(regexp = RegexpPattern.BASE64_PATTERN)
+                                                  String tinyurl) throws MongoApiException {
+        tinyUrlService.deleteTinyUrl(tinyurl);
+        log.info("Deleted " + tinyurl);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("update")
@@ -115,8 +85,9 @@ public class TinyUrlControllerImpl implements ITinyUrlController {
     public ResponseEntity<Void> reMapTinyUrl(@RequestBody @Valid UpdateUrlDto dto, BindingResult result)
             throws ValidationException, MongoApiException {
         Validator.validate(result);
+        String previousUrl = tinyUrlService.getLongUrl(dto.getTinyUrl());
         tinyUrlService.reMapTinyUrl(dto);
-        log.info("Remapping "+dto.getTinyUrl());
+        log.info("Remapping " + dto.getTinyUrl() + "to a new url. Previous url : " +previousUrl);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
